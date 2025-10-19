@@ -6,7 +6,12 @@ from pathlib import Path
 app = Flask(__name__)
 
 DOWNLOADS = Path("downloads")
-DOWNLOADS.mkdir(parents=True, exist_ok=True)  # Safely create folder if not exists
+
+# Check if DOWNLOADS exists and is a directory; fix FileExistsError if it's a file
+if not DOWNLOADS.is_dir():
+    if DOWNLOADS.exists():
+        DOWNLOADS.unlink()
+    DOWNLOADS.mkdir(parents=True)
 
 @app.route('/', methods=["GET", "POST"])
 def index():
@@ -64,6 +69,6 @@ def index():
 
 
 if __name__ == '__main__':
-    # Read port for Render deployment or default to 10000
+    # Read PORT env variable for Render deployment, default to 10000
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port, debug=True)
