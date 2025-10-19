@@ -6,18 +6,18 @@ from pathlib import Path
 
 app = Flask(__name__)
 
-# Downloads directory setup
+# Setup downloads folder safely
 DOWNLOADS = Path("downloads")
 if not DOWNLOADS.is_dir():
     if DOWNLOADS.exists():
-        DOWNLOADS.unlink()  # Remove if a file named downloads exists
+        DOWNLOADS.unlink()
     DOWNLOADS.mkdir(parents=True)
 
-# Paths for secret cookies file handling
-SECRET_COOKIES_PATH = Path('/etc/secrets/cookies.txt')  # Read-only secret file
-LOCAL_COOKIES_PATH = Path('cookies.txt')  # Writable copy in app root
+# Secret file paths for cookies
+SECRET_COOKIES_PATH = Path('/etc/secrets/cookies.txt')  # Render secret file (read-only)
+LOCAL_COOKIES_PATH = Path('cookies.txt')  # Writable local copy
 
-# Copy the secret cookies file to writable location (once per app start)
+# Copy secret cookies to writable location on app start
 if SECRET_COOKIES_PATH.exists() and not LOCAL_COOKIES_PATH.exists():
     shutil.copy(SECRET_COOKIES_PATH, LOCAL_COOKIES_PATH)
 
@@ -27,10 +27,7 @@ def index():
         url = request.form.get("url")
         fmt = request.form.get("format")
         playlist = request.form.get("playlist")
-        folder = request.form.get("folder")
-
-        if not folder:
-            folder = "mobile_downloads"
+        folder = request.form.get("folder") or "mobile_downloads"
 
         if not url:
             return "Please enter video URL", 400
@@ -40,7 +37,13 @@ def index():
 
         ydl_opts = {
             'outtmpl': str(save_path / '%(title)s.%(ext)s'),
-            'cookiefile': str(LOCAL_COOKIES_PATH),  # Use writable cookies file
+            'cookiefile': str(LOCAL_COOKIES_PATH),
+            'http_headers': {
+                'User-Agent': (
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                    '(KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36'
+                )
+            },
             'quiet': True,
             'no_warnings': True,
         }
