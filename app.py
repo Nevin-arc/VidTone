@@ -1,4 +1,5 @@
 import os
+import shutil
 from flask import Flask, request, render_template, redirect, url_for
 import yt_dlp
 from pathlib import Path
@@ -9,8 +10,16 @@ app = Flask(__name__)
 DOWNLOADS = Path("downloads")
 if not DOWNLOADS.is_dir():
     if DOWNLOADS.exists():
-        DOWNLOADS.unlink()  # Remove file if downloads is accidentally a file
+        DOWNLOADS.unlink()  # Remove if a file named downloads exists
     DOWNLOADS.mkdir(parents=True)
+
+# Paths for secret cookies file handling
+SECRET_COOKIES_PATH = Path('/etc/secrets/cookies.txt')  # Read-only secret file
+LOCAL_COOKIES_PATH = Path('cookies.txt')  # Writable copy in app root
+
+# Copy the secret cookies file to writable location (once per app start)
+if SECRET_COOKIES_PATH.exists() and not LOCAL_COOKIES_PATH.exists():
+    shutil.copy(SECRET_COOKIES_PATH, LOCAL_COOKIES_PATH)
 
 @app.route('/', methods=["GET", "POST"])
 def index():
@@ -29,12 +38,9 @@ def index():
         save_path = DOWNLOADS / folder
         save_path.mkdir(parents=True, exist_ok=True)
 
-        # Path to cookies file mounted from Render Secret Files
-        cookies_path = "/etc/secrets/cookies.txt"
-
         ydl_opts = {
             'outtmpl': str(save_path / '%(title)s.%(ext)s'),
-            'cookiefile': cookies_path,  # Use secret cookies for authentication
+            'cookiefile': str(LOCAL_COOKIES_PATH),  # Use writable cookies file
             'quiet': True,
             'no_warnings': True,
         }
