@@ -5,12 +5,11 @@ from pathlib import Path
 
 app = Flask(__name__)
 
+# Downloads directory setup
 DOWNLOADS = Path("downloads")
-
-# Check if DOWNLOADS exists and is a directory; fix FileExistsError if it's a file
 if not DOWNLOADS.is_dir():
     if DOWNLOADS.exists():
-        DOWNLOADS.unlink()
+        DOWNLOADS.unlink()  # Remove file if downloads is accidentally a file
     DOWNLOADS.mkdir(parents=True)
 
 @app.route('/', methods=["GET", "POST"])
@@ -30,8 +29,12 @@ def index():
         save_path = DOWNLOADS / folder
         save_path.mkdir(parents=True, exist_ok=True)
 
+        # Path to cookies file mounted from Render Secret Files
+        cookies_path = "/etc/secrets/cookies.txt"
+
         ydl_opts = {
             'outtmpl': str(save_path / '%(title)s.%(ext)s'),
+            'cookiefile': cookies_path,  # Use secret cookies for authentication
             'quiet': True,
             'no_warnings': True,
         }
@@ -69,6 +72,5 @@ def index():
 
 
 if __name__ == '__main__':
-    # Read PORT env variable for Render deployment, default to 10000
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=True)
