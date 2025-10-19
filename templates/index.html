@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Media Downloader</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #a6c1ee, #fbc1cc);
+    margin: 0;
+    padding: 80px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+  .container {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 30px;
+    width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    text-align: center;
+  }
+  .container h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  .container p.description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 30px;
+  }
+  input[type="text"] {
+    width: 95%;
+    padding: 14px 16px;
+    border: 1.5px solid #ccc;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-bottom: 30px;
+  }
+  input[type="text"]:focus {
+    border-color: #0066f5;
+  }
+  select {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 30px;
+    border: 1.5px solid #ccc;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  select:focus {
+    border-color: #0066f5;
+  }
+  button {
+    background-color: #0066f5;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    padding: 14px 0;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #004bb5;
+  }
+  .notice {
+    font-size: 12px;
+    color: #888;
+    margin-top: 15px;
+  }
+  /* Hide folder input on mobile */
+  @media (max-width: 600px) {
+    #folder-field {
+      display: none;
+    }
+    .container {
+      width: 90vw;
+      padding: 30px 15px;
+    }
+  }
+  /* Spinner */
+  #loadingSpinner {
+    display: none;
+    margin-top: 20px;
+  }
+  #loadingSpinner svg {
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Media Downloader</h1>
+    <p class="description">Download videos from YouTube and more in video or audio format for free</p>
+    <form method="post" action="/">
+      <input type="text" name="url" placeholder="Paste video URL here" required />
+      <div id="folder-field">
+        <input type="text" name="folder" placeholder="Download folder name" />
+      </div>
+      <select name="format" required>
+        <option value="video">Video + Audio (MP4)</option>
+        <option value="audio">Audio only (MP3)</option>
+      </select>
+      <select name="playlist" required>
+        <option value="no">Single video</option>
+        <option value="yes">Playlist</option>
+      </select>
+      <button type="submit">Download</button>
+    </form>
+
+    <div id="loadingSpinner">
+      <svg width="50" height="50" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" stroke="#007bff" stroke-width="5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <p>Downloading, please wait...</p>
+    </div>
+
+    <p class="notice">Please respect copyright laws and terms of service.</p>
+  </div>
+
+  <!-- Show spinner on submit -->
+  <script>
+    const form = document.querySelector('form');
+    const spinner = document.getElementById('loadingSpinner');
+
+    form.addEventListener('submit', () => {
+      spinner.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
