@@ -4,8 +4,9 @@ import yt_dlp
 from pathlib import Path
 
 app = Flask(__name__)
+
 DOWNLOADS = Path("downloads")
-DOWNLOADS.mkdir(exist_ok=True)
+DOWNLOADS.mkdir(parents=True, exist_ok=True)  # Safely create folder if not exists
 
 @app.route('/', methods=["GET", "POST"])
 def index():
@@ -63,5 +64,6 @@ def index():
 
 
 if __name__ == '__main__':
+    # Read port for Render deployment or default to 10000
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port, debug=True)
